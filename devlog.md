@@ -16,3 +16,11 @@ Each teller has its own semaphore that it waits on until a customer walks up. Th
 One thing I had to think about was how the tellers stop. When there are no customers left, each teller is still stuck waiting for someone to walk up. So after all the customers finish, main wakes up each teller with None as the customer, and the teller sees that and leaves. I also noticed the output order changes every time I run it, which makes sense since the threads run at the same time.
 
 Next session I'm adding the rest of the conversation (asking for the transaction, giving it, finishing, and the customer leaving).
+
+# 11-10 10:05pm
+
+Picking back up on project2.py. Right now the customer just introduces itself and the teller serves it, so this session I'm adding the rest of the conversation between them. The teller asks for the transaction, the customer tells it deposit or withdrawal, the teller does the transaction and tells the customer it's done, and then the customer leaves.
+
+Each of those steps needs its own semaphore for each teller, since one side has to wait for the other every time. The teller waits for the customer to arrive, then the customer waits for the teller to ask, then the teller waits for the transaction, and so on. The customer will also pick deposit or withdrawal at random and write it into a shared slot for that teller, the same way it writes its id.
+
+I'm still keeping it at a small number of customers so the output is easy to follow. The manager and safe come next session, and the door after that.
