@@ -1,5 +1,6 @@
 import threading
 import random
+import time
 
 NUM_TELLERS = 3
 NUM_CUSTOMERS = 3   # only 3 for now, changing to 50 once it all works
@@ -24,6 +25,10 @@ transaction_given = [threading.Semaphore(0) for i in range(NUM_TELLERS)]   # cus
 transaction_done = [threading.Semaphore(0) for i in range(NUM_TELLERS)]    # teller -> customer
 customer_left = [threading.Semaphore(0) for i in range(NUM_TELLERS)]       # customer -> teller
 teller_transaction = [None] * NUM_TELLERS   # customer puts "deposit" or "withdrawal" here
+
+# only 1 teller can talk to the manager at a time, and only 2 can be in the safe
+manager = threading.Semaphore(1)
+safe = threading.Semaphore(2)
 
 
 def say(kind, id, other, msg):
@@ -61,7 +66,22 @@ def teller(t):
         kind = teller_transaction[t]
         say("Teller", t, who, "handling " + kind + " transaction")
 
-        # (manager and safe go here next session)
+        # withdrawals need the manager's ok first
+        if kind == "withdrawal":
+            say("Teller", t, who, "going to the manager")
+            manager.acquire()
+            say("Teller", t, who, "getting manager's permission")
+            time.sleep(random.randint(5, 30) / 1000)
+            say("Teller", t, who, "got manager's permission")
+            manager.release()
+
+        # every transaction happens in the safe
+        say("Teller", t, who, "going to safe")
+        safe.acquire()
+        say("Teller", t, who, "enter safe")
+        time.sleep(random.randint(10, 50) / 1000)
+        say("Teller", t, who, "leaving safe")
+        safe.release()
 
         say("Teller", t, who, "done with transaction")
         transaction_done[t].release()

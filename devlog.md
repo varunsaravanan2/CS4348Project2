@@ -43,3 +43,13 @@ Starting session 3. The teller and customer can talk to each other now, but the 
 The manager can only talk to one teller at a time, so I'm going to use a semaphore that starts at 1. The safe allows two tellers inside at once, so its semaphore starts at 2 instead. A teller only goes to the manager if the transaction is a withdrawal, and every teller goes to the safe. Both of these take time, so the teller will sleep for a random amount, 5 to 30 ms with the manager and 10 to 50 ms in the safe.
 
 The spec also wants three lines for each resource: going to it, using it, and done with it. Plus there are two lines for every sleep, one before and one after.
+
+# 11-11 2:23pm
+
+Added the manager and the safe. The manager is a semaphore that starts at 1 so only one teller can talk to it at a time, and the safe starts at 2 so two tellers can be inside together. Only withdrawals go to the manager, and every transaction goes to the safe. Each one prints three lines: going to it, using it, and done with it.
+
+One thing I had to look up was the sleep. The spec gives the times in milliseconds, but time.sleep in Python takes seconds, so I pick a random number of ms and divide it by 1000. If I had passed it in straight it would have slept for 5 to 50 whole seconds instead.
+
+I ran it with 10 customers to make sure there were never more than two tellers in the safe or more than one with the manager at the same time. Withdrawals went to the manager first and deposits went straight to the safe.
+
+Door and bank opening/closing next.
