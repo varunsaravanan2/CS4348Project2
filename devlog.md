@@ -35,3 +35,11 @@ At first I thought the teller could go back to ready as soon as the transaction 
 I tested it with 3 customers and then 10, and every customer left its teller and all 3 tellers stopped at the end.
 
 Manager and safe next.
+
+# 11-11 10:48am
+
+Starting session 3. The teller and customer can talk to each other now, but the teller doesn't actually do anything with the transaction yet. This session I'm adding the manager and the safe, which are the shared resources the tellers have to wait their turn for.
+
+The manager can only talk to one teller at a time, so I'm going to use a semaphore that starts at 1. The safe allows two tellers inside at once, so its semaphore starts at 2 instead. A teller only goes to the manager if the transaction is a withdrawal, and every teller goes to the safe. Both of these take time, so the teller will sleep for a random amount, 5 to 30 ms with the manager and 10 to 50 ms in the safe.
+
+The spec also wants three lines for each resource: going to it, using it, and done with it. Plus there are two lines for every sleep, one before and one after.
