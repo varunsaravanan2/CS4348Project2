@@ -19,8 +19,19 @@ Next session I'm adding the rest of the conversation (asking for the transaction
 
 # 11-10 10:05pm
 
-Picking back up on project2.py. Right now the customer just introduces itself and the teller serves it, so this session I'm adding the rest of the conversation between them. The teller asks for the transaction, the customer tells it deposit or withdrawal, the teller does the transaction and tells the customer it's done, and then the customer leaves.
+Picking back up on project2.py. Right now the customer just introduces itself and the teller serves it, so this session I'm adding the rest of the conversation between them. The teller asks for the transaction, the customer tells it deposit/withdrawal, the teller does the transaction and tells the customer it's done. Customer leaves after.
 
 Each of those steps needs its own semaphore for each teller, since one side has to wait for the other every time. The teller waits for the customer to arrive, then the customer waits for the teller to ask, then the teller waits for the transaction, and so on. The customer will also pick deposit or withdrawal at random and write it into a shared slot for that teller, the same way it writes its id.
 
 I'm still keeping it at a small number of customers so the output is easy to follow. The manager and safe come next session, and the door after that.
+
+
+# 11-10 11:23pm
+
+Finished the conversation between the teller and the customer. The teller asks for the transaction, the customer gives it, the teller handles it, and then the customer leaves. I added four new semaphores for each teller, one for each step, so every step is one thread releasing and the other waiting. The customer picks deposit or withdrawal at random and writes it into a shared slot for the teller, the same way it does with its id.
+
+At first I thought the teller could go back to ready as soon as the transaction was done. But then the next customer could pick that teller while the last one was still there, so the teller waits for its customer to leave first.
+
+I tested it with 3 customers and then 10, and every customer left its teller and all 3 tellers stopped at the end.
+
+Manager and safe next.

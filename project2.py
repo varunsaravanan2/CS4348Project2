@@ -18,6 +18,13 @@ line_lock = threading.Semaphore(1)
 customer_arrived = [threading.Semaphore(0) for i in range(NUM_TELLERS)]
 teller_customer = [None] * NUM_TELLERS   # customer puts its id here
 
+# the back and forth between a teller and its customer, one step per semaphore
+ask_transaction = [threading.Semaphore(0) for i in range(NUM_TELLERS)]     # teller -> customer
+transaction_given = [threading.Semaphore(0) for i in range(NUM_TELLERS)]   # customer -> teller
+transaction_done = [threading.Semaphore(0) for i in range(NUM_TELLERS)]    # teller -> customer
+customer_left = [threading.Semaphore(0) for i in range(NUM_TELLERS)]       # customer -> teller
+teller_transaction = [None] * NUM_TELLERS   # customer puts "deposit" or "withdrawal" here
+
 
 def say(kind, id, other, msg):
     print_lock.acquire()
@@ -43,12 +50,33 @@ def teller(t):
             # None means main is done and wants the teller to stop
             break
 
-        say("Teller", t, "Customer " + str(c), "serving a customer")
+        who = "Customer " + str(c)
+        say("Teller", t, who, "serving a customer")
+
+        # ask what they want and wait for the answer
+        say("Teller", t, who, "asks for transaction")
+        ask_transaction[t].release()
+        transaction_given[t].acquire()
+
+        kind = teller_transaction[t]
+        say("Teller", t, who, "handling " + kind + " transaction")
+
+        # (manager and safe go here next session)
+
+        say("Teller", t, who, "done with transaction")
+        transaction_done[t].release()
+
+        # wait for the customer to actually walk away before taking the next one
+        say("Teller", t, who, "waiting for customer to leave")
+        customer_left[t].acquire()
 
     say("Teller", t, "", "leaving for the day")
 
 
 def customer(c):
+    kind = random.choice(["deposit", "withdrawal"])
+    say("Customer", c, "", "wants to perform a " + kind + " transaction")
+
     say("Customer", c, "", "getting in line")
 
     # blocks here until some teller is free
@@ -64,6 +92,17 @@ def customer(c):
     teller_customer[t] = c
     say("Customer", c, "Teller " + str(t), "introduces itself")
     customer_arrived[t].release()
+
+    # wait for the teller to ask, then tell it what i want
+    ask_transaction[t].acquire()
+    teller_transaction[t] = kind
+    say("Customer", c, "Teller " + str(t), "asks for " + kind + " transaction")
+    transaction_given[t].release()
+
+    # wait until the teller says it's done
+    transaction_done[t].acquire()
+    say("Customer", c, "Teller " + str(t), "leaves teller")
+    customer_left[t].release()
 
 
 tellers = []
