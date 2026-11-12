@@ -53,3 +53,11 @@ One thing I had to look up was the sleep. The spec gives the times in millisecon
 I ran it with 10 customers to make sure there were never more than two tellers in the safe or more than one with the manager at the same time. Withdrawals went to the manager first and deposits went straight to the safe.
 
 Door and bank opening/closing next.
+
+# 11-12 12:10pm
+
+Starting session 4. The whole transaction works now, including the manager and safe, but customers can still walk straight in whenever they want. This session I'm adding the door and the bank opening and closing.
+
+The door only lets two customers through at a time, so it's another semaphore that starts at 2, like the safe. Customers go through it to come in and again to leave. Before entering, each customer also waits a random 0 to 100 ms.
+
+The bank can't open until all three tellers are ready. I'm going to keep a count of ready tellers with a lock around it, and have the last one to get ready release a semaphore that the customers are waiting on. Closing should happen after every customer has left and the tellers have stopped, which is close to what main already does.
