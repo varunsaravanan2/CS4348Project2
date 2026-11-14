@@ -30,6 +30,14 @@ teller_transaction = [None] * NUM_TELLERS   # customer puts "deposit" or "withdr
 manager = threading.Semaphore(1)
 safe = threading.Semaphore(2)
 
+# only 2 customers can go through the door at a time
+door = threading.Semaphore(2)
+
+# customers wait on this until all 3 tellers are ready
+bank_open = threading.Semaphore(0)
+tellers_started = 0
+started_lock = threading.Semaphore(1)
+
 
 def say(kind, id, other, msg):
     print_lock.acquire()
@@ -38,6 +46,9 @@ def say(kind, id, other, msg):
 
 
 def teller(t):
+    global tellers_started
+    first_time = True
+
     while True:
         say("Teller", t, "", "ready to serve")
 
@@ -46,6 +57,20 @@ def teller(t):
         ready_line.append(t)
         line_lock.release()
         tellers_ready.release()
+
+        # the first time through, count this teller as ready
+        # and the last one to get ready opens the bank
+        if first_time:
+            first_time = False
+            started_lock.acquire()
+            tellers_started += 1
+            if tellers_started == NUM_TELLERS:
+                print_lock.acquire()
+                print("The bank is now open.")
+                print_lock.release()
+                for i in range(NUM_CUSTOMERS):
+                    bank_open.release()
+            started_lock.release()
 
         say("Teller", t, "", "waiting for a customer")
         customer_arrived[t].acquire()
@@ -97,6 +122,18 @@ def customer(c):
     kind = random.choice(["deposit", "withdrawal"])
     say("Customer", c, "", "wants to perform a " + kind + " transaction")
 
+    # wait a random 0 to 100 ms before heading to the bank
+    say("Customer", c, "", "waiting before going to the bank")
+    time.sleep(random.randint(0, 100) / 1000)
+    say("Customer", c, "", "going to the bank")
+
+    # can't go in until all the tellers are ready
+    bank_open.acquire()
+
+    door.acquire()
+    say("Customer", c, "", "entering bank")
+    door.release()
+
     say("Customer", c, "", "getting in line")
 
     # blocks here until some teller is free
@@ -123,6 +160,10 @@ def customer(c):
     transaction_done[t].acquire()
     say("Customer", c, "Teller " + str(t), "leaves teller")
     customer_left[t].release()
+
+    door.acquire()
+    say("Customer", c, "", "leaving the bank")
+    door.release()
 
 
 tellers = []

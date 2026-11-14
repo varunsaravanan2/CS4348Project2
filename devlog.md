@@ -61,3 +61,14 @@ Starting session 4. The whole transaction works now, including the manager and s
 The door only lets two customers through at a time, so it's another semaphore that starts at 2, like the safe. Customers go through it to come in and again to leave. Before entering, each customer also waits a random 0 to 100 ms.
 
 The bank can't open until all three tellers are ready. I'm going to keep a count of ready tellers with a lock around it, and have the last one to get ready release a semaphore that the customers are waiting on. Closing should happen after every customer has left and the tellers have stopped, which is close to what main already does.
+
+
+# 11-13 9:20pm
+
+Added the door and the bank opening and closing. The door is a semaphore that starts at 2, and customers go through it on the way in and out. Before heading to the bank, each customer waits a random 0 to 100 ms.
+
+To open the bank, each teller adds one to a shared count when it's ready, with a lock so two tellers can't both think they're the last one. The last teller releases a semaphore once for every customer, and customers wait on it before entering. The count has to come after the teller says it's ready, or the bank could open before all three tellers were actually ready.
+
+I tested it with 10 and 50 customers, and nobody came in before the bank opened and everyone left before it closed.
+
+50 customers and matching the sample output next.
