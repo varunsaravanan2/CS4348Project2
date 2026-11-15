@@ -72,3 +72,12 @@ To open the bank, each teller adds one to a shared count when it's ready, with a
 I tested it with 10 and 50 customers, and nobody came in before the bank opened and everyone left before it closed.
 
 50 customers and matching the sample output next.
+
+
+# 11-15 12:40pm
+
+Starting session 5, which should be the last one. Everything in the spec works now: the tellers, the customers, the manager, the safe, the door, and the bank opening and closing. So this session is mostly about finishing up.
+
+First I'm changing the number of customers from 3 to 50 for good, since that's what the final version has to run with. Then I'm going to compare my output to the sample run on e-learning and change my messages to match it as closely as I can, since the tests will probably look for specific lines. I also need to make sure every sleep has a line before and after it, and that the manager and safe each have their three lines.
+
+After that I'm writing the README, which needs to say what the files are and how to run the program, and then zipping the whole repo to submit like last time.
