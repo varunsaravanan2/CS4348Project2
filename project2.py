@@ -3,7 +3,7 @@ import random
 import time
 
 NUM_TELLERS = 3
-NUM_CUSTOMERS = 3   # only 3 for now, changing to 50 once it all works
+NUM_CUSTOMERS = 50   # only 3 for now, changing to 50 once it all works
 
 # lock for printing so lines from different threads don't get mixed together
 print_lock = threading.Semaphore(1)

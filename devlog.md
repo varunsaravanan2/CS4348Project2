@@ -81,3 +81,11 @@ Starting session 5, which should be the last one. Everything in the spec works n
 First I'm changing the number of customers from 3 to 50 for good, since that's what the final version has to run with. Then I'm going to compare my output to the sample run on e-learning and change my messages to match it as closely as I can, since the tests will probably look for specific lines. I also need to make sure every sleep has a line before and after it, and that the manager and safe each have their three lines.
 
 After that I'm writing the README, which needs to say what the files are and how to run the program, and then zipping the whole repo to submit like last time.
+
+# 11-15 8:20pm
+
+Changed the number of customers to 50, which is what the final version has to run with. I ran it a bunch of times, and every run served all 50 customers, everyone left the bank, and it ended with the bank closing. With 50 customers there's way more going on at once, so I checked that there were never more than two tellers in the safe or more than one with the manager, and that only withdrawals went to the manager.
+
+I also went through my output and checked it against the output rules in the spec. Every line uses the format from the spec, like Customer 10 [Teller 0]: selects teller, every sleep has a line before and after it, and the manager and safe each have their three lines: going to it, using it, and leaving it.
+
+I also wrote the README, which says what the files are and how to run the program. The project should be done now, so all that's left is zipping the repo and submitting it.
